@@ -2,49 +2,31 @@
 #include <string>
 #include <vector>
 #include <stdio.h>
+#include <cstring>
 
 using namespace std;
 
-vector<string> tokenize(const char *str, char c = ' ');
+void tokenize(char* tokens);
+
+void create();
+void drop();
+void use();
+void alter();
+void select();
 
 int main() {
 
     bool exit = false;
     while(exit == false) {
 
-        // const char *userInput;
-        // vector <string> tokens;
-
-        string strUserInput;
+        char userInput[50];
 
         cout << "--CS457 PA1" << endl << endl;
+        cin.getline(userInput, 50);
 
-        // userInput[] = strUserInput;
-        // tokens = tokenize(userInput);
+        char* tokens = strtok(userInput, " ");
 
-        getline(cin, strUserInput);
-        char userInput[] = strUserInput;
-
-        char str[] = "Geeks for Geeks";
-        char *token;
-        char *rest = str;
-    
-        while ((token = strtok_r(rest, " ", &rest)))
-            printf("%s\n", token);
-    
-
-        // stringstream check1(userInput);
-
-        // string intermediate;
-
-        // while (getline(check1, intermediate, ' ')) {
-        //     tokens.push_back(intermediate);
-        // }
-
-        // for(int i = 0; i < tokens.size(); i++) {
-        //     cout << tokens[i] << '\n';
-        // }
-
+        tokenize(tokens);
 
         exit = true;                
 
@@ -53,22 +35,40 @@ int main() {
     return 0;
 }
 
-vector<string> tokenize(const char *str, char c) {
+void tokenize(char* tokens) {
 
-    vector<string> result;
+        cout << "token1 = " << tokens << endl;
+        
+        tokens = strtok(NULL, " ");
+        cout << "token2 = " << tokens << endl;
+        
+        tokens = strtok(NULL, " ");
+        cout << "token3 = " << tokens << endl;
 
-    do {
+        tokens = strtok(NULL, " ");
+        cout << "token4 = " << tokens << endl;
 
-        const char *begin = str;
+        tokens = strtok(NULL, " ");
+        cout << "token5 = " << tokens << endl;
 
-        while (*str != c && *str) {
-            str++;
-        }
+}
 
-        result.push_back(string(begin, str));
+void create() {
 
-    } while (0 != *str++);
+}
 
-    return result;
+void drop() {
+
+}
+
+void use() {
+
+}
+
+void alter() {
+
+}
+
+void select() {
 
 }
