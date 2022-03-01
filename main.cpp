@@ -34,61 +34,52 @@ int main() {
 
 void tokenize(char* tokens) {
 
-        cout << "token1 = " << tokens << endl;
-        token1 = tokens;
+        char* token1 = tokens;
         
         tokens = strtok(NULL, " ");
-        cout << "token2 = " << tokens << endl;
-        token2 = tokens;
+        char* token2 = tokens;
         
         tokens = strtok(NULL, " ");
-        cout << "token3 = " << tokens << endl;
-        token3 = tokens;
+        char* token3 = tokens;
 
         tokens = strtok(NULL, " ");
-        cout << "token4 = " << tokens << endl;
-        token4 = tokens;
+        char* token4 = tokens;
 
         tokens = strtok(NULL, " ");
-        cout << "token5 = " << tokens << endl;
-        token5 = tokens;
+        char* token5 = tokens;
 
-        switch (token1)
-        {
-        case (token1 == "CREATE"):
-            /* code */
-            break;
-        case (token1 == "DROP"):
-            break;
-        case (token1 == "USE"):
-            break;
-        case (token1 == "ALTER"):
-            break;
-        case (token1 == "SELECT"):
-            break;
-        default:
-            cout << "invalid input."
-            break;
+        //cout << token1 << endl << token2 << endl << token3 << endl << token4 << endl << token5 << endl;
+
+        if (token1 == "CREATE") {
+            create();
+        } else if (token1 == "DROP") {
+            drop();
+        } else if (token1 == "USE") {
+            use();
+        } else if (token1 == "ALTER") {
+            alter();
+        } else if (token1 == "SELECT") {
+            select();
         }
 
 }
 
 void create() {
-
+    cout << "create" << endl;
 }
 
 void drop() {
-
+    cout << "drop" << endl;
 }
 
 void use() {
-
+    cout << "use" << endl;
 }
 
 void alter() {
-
+    cout << "alter" << endl;
 }
 
 void select() {
-
+    cout << "select" << endl;
 }
