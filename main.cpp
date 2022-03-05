@@ -8,7 +8,7 @@
 
 using namespace std;
 
-void tokenize(char userInput[50]);
+bool tokenize(char userInput[50]);
 void create(char* tokens);
 bool databaseExists(const string &s);
 void drop(char* tokens);
@@ -19,22 +19,21 @@ void select();
 int main() {
 
     bool exit = false;
+    char userInput[50];
+    
+    cout << "--CS457 PA1" << endl << endl;
+
     while(exit == false) {
-
-        char userInput[50];
-
-        cout << "--CS457 PA1" << endl << endl;
+        cout << "-- ";
         cin.getline(userInput, 50);
-        tokenize(userInput);
-
-        exit = true;                
+        exit = tokenize(userInput);
 
     }
 
     return 0;
 }
 
-void tokenize(char userInput[50]) {
+bool tokenize(char userInput[50]) {
     
     char* tokens = strtok(userInput, " ");
     string token1 = tokens;
@@ -47,27 +46,12 @@ void tokenize(char userInput[50]) {
         alter();
     } else if (token1 == "SELECT") {
         select();
+    } else if (token1 == ".EXIT") {
+        return true;
     } else {
         cout << "Invalid Input." << endl;
     }
-
-    // while((tokens = strtok(NULL, " ")) != NULL) {
-    //     char* nextToken = tokens;
-    //     string strNextToken = nextToken;
-
-    //     if (strNextToken == "CREATE") {
-    //         create(nextToken);
-    //     } else if (strNextToken == "DROP") {
-    //         drop(nextToken);
-    //     } else if (strNextToken == "ALTER") {
-    //         alter();
-    //     } else if (strNextToken == "SELECT") {
-    //         select();
-    //     } else {
-    //         cout << "Invalid Input." << endl;
-    //     }
-
-    // }
+    return false;
 
 }
 
@@ -180,6 +164,26 @@ void select() {
     // print contents to screen seperated by |
 }
 
+
+
+
+    // while((tokens = strtok(NULL, " ")) != NULL) {
+    //     char* nextToken = tokens;
+    //     string strNextToken = nextToken;
+
+    //     if (strNextToken == "CREATE") {
+    //         create(nextToken);
+    //     } else if (strNextToken == "DROP") {
+    //         drop(nextToken);
+    //     } else if (strNextToken == "ALTER") {
+    //         alter();
+    //     } else if (strNextToken == "SELECT") {
+    //         select();
+    //     } else {
+    //         cout << "Invalid Input." << endl;
+    //     }
+
+    // }
 
 
 
