@@ -5,14 +5,16 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
+#include <filesystem>
 
 using namespace std;
 
 bool tokenize(char userInput[50]);
 void create(char* tokens);
 bool databaseExists(const string &s);
+bool tableExists(const string &s);
 void drop(char* tokens);
-void use();
+string use(char* tokens);
 void alter();
 void select();
 
@@ -21,10 +23,9 @@ int main() {
     bool exit = false;
     char userInput[50];
     
-    cout << "--CS457 PA1" << endl << endl;
+    cout << "-- CS457 PA1" << endl << endl;
 
     while(exit == false) {
-        cout << "-- ";
         cin.getline(userInput, 50);
         exit = tokenize(userInput);
 
@@ -47,6 +48,7 @@ bool tokenize(char userInput[50]) {
     } else if (token1 == "SELECT") {
         select();
     } else if (token1 == ".EXIT") {
+        cout << "-- All done." << endl;
         return true;
     } else {
         cout << "Invalid Input." << endl;
@@ -79,6 +81,19 @@ void create(char* tokens) {
 
     } else if (strToken2 == "TABLE") {
 
+        tokens = strtok(NULL, " ");
+        char* charTableName = tokens;
+        string tableName = charTableName;
+        
+        bool exists = tableExists(tableName);
+
+        if (!exists) {
+
+            string path = tokens;
+            path = "/" + path;
+
+        }
+
         // if second token is TABLE
             // create new file with third token as name and fourth token as header
             // as long as using a database and name is not in use yet
@@ -89,6 +104,12 @@ void create(char* tokens) {
 }
 
 bool databaseExists(const string &s) {
+    struct stat buffer;
+    return(stat(s.c_str(), &buffer) == 0);
+
+}
+
+bool tableExists(const string &s) {
     struct stat buffer;
     return(stat(s.c_str(), &buffer) == 0);
 
@@ -123,8 +144,19 @@ void drop(char* tokens) {
             // if not, error
 }
 
-void use(char* tokens) {
-    // cout << "use" << endl;
+string use(char* tokens) {
+
+    char* token1 = tokens;
+
+    tokens = strtok(NULL, " ");
+    char* token2 = tokens;
+    string path = token2;
+
+    path = "/" + path;
+
+    cout << path << endl;
+
+    return path;
 
     // char* token1 = tokens;
 
