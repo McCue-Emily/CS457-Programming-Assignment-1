@@ -3,6 +3,7 @@
 #include <string>
 #include <stdio.h>
 #include <cstring>
+#include <algorithm>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
@@ -122,27 +123,29 @@ void createTB(char* useLoopTokens, string dbName) {
         string totalPath = dbName + "/" + tbName + ".txt";
 
         string restOfTokens;
-        while (useLoopTokens != NULL) {
-            restOfTokens += useLoopTokens;
+        char* tempVar;
+
+        while ((useLoopTokens = strtok(NULL, " ")) != NULL) {
+            tempVar = useLoopTokens;
+            restOfTokens = restOfTokens + " " + tempVar;
         }
-        cout << "rest of tokens: " << restOfTokens << endl;
+
+        if (!restOfTokens.empty()) {
+            string original = ",";
+            string replacement = " |";
+            size_t pos;
+            while ((pos = restOfTokens.find(original)) != string::npos) {
+                restOfTokens.replace(pos, 1, replacement);
+            }
+            restOfTokens.erase(0,2);
+            restOfTokens.erase(prev(restOfTokens.end()));
+        }
         
         bool exists = tableExists(totalPath);
-
+ 
         if (!exists) {
             ofstream newTB(totalPath.c_str());
-
-            // useLoopTokens = strtok(NULL, " ");
-            // char* token3 = useLoopTokens;
-            // string strToken3 = token3;
-            // cout << token3;
-
-            // useLoopTokens = strtok(NULL, " ");
-            // char* token4 = useLoopTokens;
-            // string strToken4 = token4;
-            // cout << token4;
-
-            newTB << "test1";
+            newTB << restOfTokens;
             newTB.close();
             cout << "-- Table " << tbName << " created." << endl;
         } else {
@@ -151,11 +154,6 @@ void createTB(char* useLoopTokens, string dbName) {
     } else {
         cout << "-- Invalid input." << endl;
     }
-
-    // if token is TABLE
-        // create new file with third token as name and fourth token as header
-        // as long as using a database and name is not in use yet
-            // if not using database or name in use, error
 
 }
 
