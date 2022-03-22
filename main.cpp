@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <stdio.h>
 #include <cstring>
@@ -10,13 +11,16 @@
 using namespace std;
 
 bool tokenize(char userInput[50]);
+void nowUsing(string useDBName);
+void createTB(char* useLoopTokens, string useDBName);
+void dropTB(char* useLoopTokens, string useDBName);
+bool notUsing(char* tokens);
 void create(char* tokens);
 bool databaseExists(const string &s);
-bool tableExists(const string &s);
+bool tableExists(string totalPath);
 void drop(char* tokens);
-string use(char* tokens);
-void alter();
-void select();
+void alter(char* useLoopTokens, string useDBName);
+void select(char* useLoopTokens, string useDBName);
 
 int main() {
 
@@ -28,7 +32,6 @@ int main() {
     while(exit == false) {
         cin.getline(userInput, 50);
         exit = tokenize(userInput);
-
     }
 
     return 0;
@@ -39,20 +42,129 @@ bool tokenize(char userInput[50]) {
     char* tokens = strtok(userInput, " ");
     string token1 = tokens;
 
-    if (token1 == "CREATE") {
+    if (token1 == "USE") {
+        tokens = strtok(NULL, " ");
+        string useDBName = tokens;
+        bool exists = databaseExists(useDBName);
+        if(exists) {
+            cout << "-- Using database " << useDBName << endl;
+            nowUsing(useDBName);
+            return true;
+        } else {
+            cout << "-- !Failed to use database " << useDBName << " because it does not exist." << endl;
+        }
+        return false;
+    } else {
+        bool notUsingLoop = notUsing(tokens);
+        return notUsingLoop;
+    }
+
+}
+
+void nowUsing(string useDBName) {
+
+    bool exitUseLoop = false;
+    char userInputUseLoop[50];
+
+    while (exitUseLoop == false) {
+
+        cin.getline(userInputUseLoop, 50);
+        char* useLoopTokens = strtok(userInputUseLoop, " ");
+        char* charToken1 = useLoopTokens;
+        string token1 = charToken1;
+
+        if (token1 == "USE") {
+
+            useLoopTokens = strtok(NULL, " ");
+            string useDBName = useLoopTokens;
+
+            bool exists = databaseExists(useDBName);
+
+            if(exists) {
+                cout << "-- Using database " << useDBName << endl;
+                nowUsing(useDBName);
+            } else {
+                cout << "-- !Failed to use database " << useDBName << " because it does not exist." << endl;
+            }
+
+        } else if (token1 == "CREATE") {
+            createTB(useLoopTokens, useDBName);
+        } else if (token1 == "DROP") {
+            dropTB(useLoopTokens, useDBName);
+        } else if (token1 == "ALTER") {
+            alter(useLoopTokens, useDBName);
+        } else if (token1 == "SELECT") {
+            select(useLoopTokens, useDBName);
+        } else if (token1 == ".EXIT") {
+            cout << "-- All done." << endl;
+            exitUseLoop = true;
+        } else {
+            cout << "Invalid Input." << endl;
+        }
+
+    }
+
+}
+
+void createTB(char* useLoopTokens, string dbName) {
+
+    useLoopTokens = strtok(NULL, " ");
+    char* tableToken = useLoopTokens;
+    string tbCheck = tableToken;
+
+    if (tbCheck == "TABLE") {
+        useLoopTokens = strtok(NULL, " ");
+        char* charTBName = useLoopTokens;
+        string tbName = charTBName;
+        string totalPath = dbName + "/" + tbName + ".txt";
+        
+        bool exists = tableExists(totalPath);
+
+        if (!exists) {
+            ofstream newTB(totalPath.c_str());
+            newTB << "test1";
+            newTB.close();
+        } else {
+            cout << "-- !Failed to create table " << tbName << " because it already exists." << endl;
+        }
+    } else {
+        cout << "-- Invalid input." << endl;
+    }
+
+    // if token is TABLE
+        // create new file with third token as name and fourth token as header
+        // as long as using a database and name is not in use yet
+            // if not using database or name in use, error
+
+}
+
+void dropTB(char* useLoopTokens, string useDBName) {
+
+    // if second token is TABLE
+        // delete file with table name in database that currently using
+            // if not table with that name, error
+        // as long as in a database
+            // if not, error
+
+}
+
+bool notUsing(char* tokens) {
+
+    //tokens = strtok(NULL, " ");
+    char* token1 = tokens;
+    string functionName = token1;
+
+    if (functionName == "CREATE") {
         create(tokens);
-    } else if (token1 == "DROP") {
+    } else if (functionName == "DROP") {
         drop(tokens);
-    } else if (token1 == "ALTER") {
-        alter();
-    } else if (token1 == "SELECT") {
-        select();
-    } else if (token1 == ".EXIT") {
+    } else if (functionName == ".EXIT") {
         cout << "-- All done." << endl;
         return true;
     } else {
-        cout << "Invalid Input." << endl;
+        cout << "-- Invalid Input." << endl;
     }
+
     return false;
 
 }
@@ -79,25 +191,8 @@ void create(char* tokens) {
             cout << "-- !Failed to create database " << dbName << " because it already exists." << endl;
         }
 
-    } else if (strToken2 == "TABLE") {
-
-        tokens = strtok(NULL, " ");
-        char* charTableName = tokens;
-        string tableName = charTableName;
-        
-        bool exists = tableExists(tableName);
-
-        if (!exists) {
-
-            string path = tokens;
-            path = "/" + path;
-
-        }
-
-        // if second token is TABLE
-            // create new file with third token as name and fourth token as header
-            // as long as using a database and name is not in use yet
-                // if not using database or name in use, error
+    } else {
+        cout << "-- Invalid input." << endl;
 
     }
     
@@ -109,9 +204,16 @@ bool databaseExists(const string &s) {
 
 }
 
-bool tableExists(const string &s) {
-    struct stat buffer;
-    return(stat(s.c_str(), &buffer) == 0);
+bool tableExists(string totalPath) {
+
+    ifstream tbCheck;
+    tbCheck.open(totalPath);
+
+    if(tbCheck) {
+        return true;
+    } else {
+        return false;
+    }
 
 }
 
@@ -130,47 +232,18 @@ void drop(char* tokens) {
         
         bool exists = databaseExists(dbName);
         if (exists) {
+            // IF THERES FILE IN DATABASE, MUST DUMP THEM BEFORE DB WILL DELETE
             rmdir(charDBName);
+            cout << "-- Database " << dbName << " deleted." << endl;
         } else {
-            cout << "error: db does not exist" << endl;
+            cout << "-- !Failed to delete " << dbName << " because it does not exist." << endl;
         }
 
     }
 
-    // if second token is TABLE
-        // delete file with table name in database that currently using
-            // if not table with that name, error
-        // as long as in a database
-            // if not, error
 }
 
-string use(char* tokens) {
-
-    char* token1 = tokens;
-
-    tokens = strtok(NULL, " ");
-    char* token2 = tokens;
-    string path = token2;
-
-    path = "/" + path;
-
-    cout << path << endl;
-
-    return path;
-
-    // char* token1 = tokens;
-
-    // tokens = strtok(NULL, " ");
-    // char* charDBName = tokens;
-    // string dbName = charDBName;
-
-
-
-    // change directory to database name given
-        // if no database with name given, error
-}
-
-void alter() {
+void alter(char* useLoopTokens, string useDBName) {
     cout << "alter" << endl;
 
     // if second token is TABLE
@@ -182,7 +255,7 @@ void alter() {
         
 }
 
-void select() {
+void select(char* useLoopTokens, string useDBName) {
     cout << "select" << endl;
 
     // read header name after select (or * which means everything)
@@ -195,97 +268,3 @@ void select() {
 
     // print contents to screen seperated by |
 }
-
-
-
-
-    // while((tokens = strtok(NULL, " ")) != NULL) {
-    //     char* nextToken = tokens;
-    //     string strNextToken = nextToken;
-
-    //     if (strNextToken == "CREATE") {
-    //         create(nextToken);
-    //     } else if (strNextToken == "DROP") {
-    //         drop(nextToken);
-    //     } else if (strNextToken == "ALTER") {
-    //         alter();
-    //     } else if (strNextToken == "SELECT") {
-    //         select();
-    //     } else {
-    //         cout << "Invalid Input." << endl;
-    //     }
-
-    // }
-
-
-
-
-    // char* token1 = tokens;
-    // string strToken1 = token1;
-
-    // tokens = strtok(NULL, " ");
-    // char* token2 = tokens;
-    // string strToken2 = token2;
-
-    // tokens = strtok(NULL, " ");
-    // char* token3 = tokens;
-    // string strToken3 = token3;
-
-    // tokens = strtok(NULL, " ");
-    // char* token4 = tokens;
-    // string strToken4 = token4;
-
-    // tokens = strtok(NULL, " ");
-    // char* token5 = tokens;
-    // string strToken5 = token5;
-
-    // char* token1 = tokens;
-    // string strToken1 = token1;
-    // if (!strToken1.empty()) {
-
-
-
-
-    //     tokens = strtok(NULL, " ");
-    //     char* token2 = tokens;
-    //     string strToken2 = token2;
-
-    //     if (!strToken2.empty()) {
-
-    //         tokens = strtok(NULL, " ");
-    //         char* token3 = tokens;
-    //         string strToken3 = token3;
-
-    //         if (!strToken3.empty()) {
-
-    //             tokens = strtok(NULL, " ");
-    //             char* token4 = tokens;
-    //             string strToken4 = token4;
-
-    //             if (!strToken4.empty()) {
-
-    //                 tokens = strtok(NULL, " ");
-    //                 char* token5 = tokens;
-    //                 string strToken5 = token5;
-
-    //             }
-    //         }
-    //     }
-    // }
-
-
-
-    // if (strToken1 == "CREATE") {
-    //     create();
-    // } else if (strToken1 == "DROP") {
-    //     drop();
-    // } else if (strToken1 == "USE") {
-    //     use();
-    // } else if (strToken1 == "ALTER") {
-    //     alter();
-    // } else if (strToken1 == "SELECT") {
-    //     select();
-    // } else {
-    //     cout << "Invalid Command." << endl;
-    //     return;
-    // }
