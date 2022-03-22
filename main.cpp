@@ -19,18 +19,18 @@ using namespace std;
 
 bool tokenize(char userInput[50]);
 void nowUsing(string useDBName);
-void createTB(char* useLoopTokens, string useDBName);
+void createTB(char* useLoopTokens, string dbName);
 void dropTB(char* useLoopTokens, string useDBName);
 bool notUsing(char* tokens);
 void create(char* tokens);
 bool databaseExists(const string &s);
 bool tableExists(string totalPath);
 void drop(char* tokens);
-void alter(char* useLoopTokens, string useDBName);
+void alter(char* useLoopTokens, string dbName);
 void select(char* useLoopTokens, string useDBName);
 
 // once that is built out, when dropping databases, check if there's tables in them and empty them out in order to delete databases
-// then build out select and alter in order to alter the info in each table
+// then build out select in order to print the info in each table
 
 int main() {
 
@@ -284,15 +284,58 @@ void drop(char* tokens) {
 
 }
 
-void alter(char* useLoopTokens, string useDBName) {
+void alter(char* useLoopTokens, string dbName) {
     cout << "alter" << endl;
 
-    // if second token is TABLE
-        // open the file that is named the name given
-            // if no such file with name, error
-        
-        // if 3rd token is ADD
-            // add the header given to table
+    useLoopTokens = strtok(NULL, " ");
+    char* tableToken = useLoopTokens;
+    string tbCheck = tableToken;
+
+    if (tbCheck == "TABLE") {
+        useLoopTokens = strtok(NULL, " ");
+        char* charTBName = useLoopTokens;
+        string tbName = charTBName;
+        string totalPath = dbName + "/" + tbName + ".txt";
+
+        useLoopTokens = strtok(NULL, " ");
+        char* howToAlter = useLoopTokens;
+        string strHowToAlter = howToAlter;
+
+        if (strHowToAlter == "ADD") {
+
+            string restOfTokens;
+            char* tempVar;
+
+            while ((useLoopTokens = strtok(NULL, " ")) != NULL) {
+                tempVar = useLoopTokens;
+                restOfTokens = restOfTokens + " " + tempVar;
+            }
+
+            if (!restOfTokens.empty()) {
+                string original = ",";
+                string replacement = " |";
+                size_t pos;
+                while ((pos = restOfTokens.find(original)) != string::npos) {
+                    restOfTokens.replace(pos, 1, replacement);
+                }
+            }
+            
+            bool exists = tableExists(totalPath);
+    
+            if (exists) {
+                fstream modifyTB;
+                modifyTB.open(totalPath.c_str(), fstream::app);
+                modifyTB << " |" << restOfTokens;
+                modifyTB.close();
+                cout << "-- Table " << tbName << " modified." << endl;
+            } else {
+                cout << "-- !Failed to modify table " << tbName << " because it does not exist." << endl;
+            }
+        }
+
+    } else {
+        cout << "-- Invalid input." << endl;
+    }
         
 }
 
