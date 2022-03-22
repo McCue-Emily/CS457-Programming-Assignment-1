@@ -60,11 +60,20 @@ bool tokenize(char userInput[50]) {
     string token1 = tokens;
 
     if (token1 == "USE") {
+
         tokens = strtok(NULL, " ");
-        string useDBName = tokens;
+        char* temp = tokens;
+        string useDBName = temp;
+
+        size_t pos;
+        while ((pos = useDBName.find(";")) != string::npos) {
+            useDBName.replace(pos, 1, "");
+        }
+
         bool exists = databaseExists(useDBName);
+
         if(exists) {
-            cout << "-- Using database " << useDBName << endl;
+            cout << "-- Using database " << useDBName << "." << endl;
             nowUsing(useDBName);
             return true;
         } else {
@@ -99,10 +108,18 @@ void nowUsing(string useDBName) {
         char* charToken1 = useLoopTokens;
         string token1 = charToken1;
 
+        size_t pos;
+        while ((pos = token1.find(";")) != string::npos) {
+            token1.replace(pos, 1, "");
+        }
+
         if (token1 == "USE") {
 
             useLoopTokens = strtok(NULL, " ");
             string useDBName = useLoopTokens;
+            while ((pos = useDBName.find(";")) != string::npos) {
+                useDBName.replace(pos, 1, "");
+            }
 
             bool exists = databaseExists(useDBName);
 
@@ -151,6 +168,12 @@ void createTB(char* useLoopTokens, string dbName) {
         useLoopTokens = strtok(NULL, " ");
         char* charTBName = useLoopTokens;
         string tbName = charTBName;
+
+        size_t pos;
+        while ((pos = tbName.find(";")) != string::npos) {
+            tbName.replace(pos, 1, "");
+        }
+
         string totalPath = dbName + "/" + tbName + ".txt";
 
         string restOfTokens;
@@ -164,12 +187,15 @@ void createTB(char* useLoopTokens, string dbName) {
         if (!restOfTokens.empty()) {
             string original = ",";
             string replacement = " |";
-            size_t pos;
             while ((pos = restOfTokens.find(original)) != string::npos) {
                 restOfTokens.replace(pos, 1, replacement);
             }
+            while ((pos = restOfTokens.find(";")) != string::npos) {
+                restOfTokens.replace(pos, 1, "");
+            }
             restOfTokens.erase(0,2);
             restOfTokens.erase(prev(restOfTokens.end()));
+
         }
         
         bool exists = tableExists(totalPath);
@@ -207,6 +233,12 @@ void dropTB(char* useLoopTokens, string useDBName) {
         useLoopTokens = strtok(NULL, " ");
         char* charTBName = useLoopTokens;
         string tbName = charTBName;
+
+        size_t pos;
+        while ((pos = tbName.find(";")) != string::npos) {
+            tbName.replace(pos, 1, "");
+        }
+
         string totalPath = useDBName + "/" + tbName + ".txt";
         
         bool exists = tableExists(totalPath);
@@ -241,6 +273,11 @@ bool notUsing(char* tokens) {
 
     char* token1 = tokens;
     string functionName = token1;
+
+    size_t pos;
+    while ((pos = functionName.find(";")) != string::npos) {
+        functionName.replace(pos, 1, "");
+    }
 
     if (functionName == "CREATE") {
         create(tokens);
@@ -277,8 +314,9 @@ void create(char* tokens) {
     if (strToken2 == "DATABASE") {
         tokens = strtok(NULL, " ");
         char* charDBName = tokens;
+        charDBName[strlen(charDBName)-1] = '\0';
         string dbName = charDBName;
-        
+
         bool exists = databaseExists(dbName);
 
         if (!exists) {
@@ -353,6 +391,11 @@ void drop(char* tokens) {
         tokens = strtok(NULL, " ");
         char* charDBName = tokens;
         string dbName = charDBName;
+
+        size_t pos;
+        while ((pos = dbName.find(";")) != string::npos) {
+            dbName.replace(pos, 1, "");
+        }
         
         bool exists = databaseExists(dbName);
         if (exists) {
@@ -388,6 +431,7 @@ void alter(char* useLoopTokens, string dbName) {
         useLoopTokens = strtok(NULL, " ");
         char* charTBName = useLoopTokens;
         string tbName = charTBName;
+
         string totalPath = dbName + "/" + tbName + ".txt";
 
         useLoopTokens = strtok(NULL, " ");
@@ -402,6 +446,11 @@ void alter(char* useLoopTokens, string dbName) {
             while ((useLoopTokens = strtok(NULL, " ")) != NULL) {
                 tempVar = useLoopTokens;
                 restOfTokens = restOfTokens + " " + tempVar;
+            }
+
+            size_t pos;
+            while ((pos = restOfTokens.find(";")) != string::npos) {
+                restOfTokens.replace(pos, 1, "");
             }
 
             if (!restOfTokens.empty()) {
@@ -457,6 +506,12 @@ void select(char* useLoopTokens, string dbName) {
     useLoopTokens = strtok(NULL, " ");
     char* tbNameToken = useLoopTokens;
     string tbName = tbNameToken;
+    
+    size_t pos;
+    while ((pos = tbName.find(";")) != string::npos) {
+        tbName.replace(pos, 1, "");
+    }
+
     string totalPath = dbName + "/" + tbName + ".txt";
 
 
