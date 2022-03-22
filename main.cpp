@@ -6,7 +6,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 #include <sys/stat.h>
-#include <filesystem>
 
 using namespace std;
 
@@ -21,6 +20,10 @@ bool tableExists(string totalPath);
 void drop(char* tokens);
 void alter(char* useLoopTokens, string useDBName);
 void select(char* useLoopTokens, string useDBName);
+
+// once that is built out, when dropping databases, check if there's tables in them and empty them out in order to delete databases
+// be able to handle the (a1 int, a2 varchar(20)) parameters in create table
+// then build out select and alter in order to alter the info in each table
 
 int main() {
 
@@ -117,13 +120,31 @@ void createTB(char* useLoopTokens, string dbName) {
         char* charTBName = useLoopTokens;
         string tbName = charTBName;
         string totalPath = dbName + "/" + tbName + ".txt";
+
+        string restOfTokens;
+        while (useLoopTokens != NULL) {
+            restOfTokens += useLoopTokens;
+        }
+        cout << "rest of tokens: " << restOfTokens << endl;
         
         bool exists = tableExists(totalPath);
 
         if (!exists) {
             ofstream newTB(totalPath.c_str());
+
+            // useLoopTokens = strtok(NULL, " ");
+            // char* token3 = useLoopTokens;
+            // string strToken3 = token3;
+            // cout << token3;
+
+            // useLoopTokens = strtok(NULL, " ");
+            // char* token4 = useLoopTokens;
+            // string strToken4 = token4;
+            // cout << token4;
+
             newTB << "test1";
             newTB.close();
+            cout << "-- Table " << tbName << " created." << endl;
         } else {
             cout << "-- !Failed to create table " << tbName << " because it already exists." << endl;
         }
@@ -140,17 +161,36 @@ void createTB(char* useLoopTokens, string dbName) {
 
 void dropTB(char* useLoopTokens, string useDBName) {
 
-    // if second token is TABLE
-        // delete file with table name in database that currently using
-            // if not table with that name, error
-        // as long as in a database
-            // if not, error
+    useLoopTokens = strtok(NULL, " ");
+    char* tableToken = useLoopTokens;
+    string tbCheck = tableToken;
+
+    if (tbCheck == "TABLE") {
+        useLoopTokens = strtok(NULL, " ");
+        char* charTBName = useLoopTokens;
+        string tbName = charTBName;
+        string totalPath = useDBName + "/" + tbName + ".txt";
+        
+        bool exists = tableExists(totalPath);
+
+        if (exists) {
+            if (remove(totalPath.c_str()) == 0) {
+                cout << "-- Table " << tbName << " deleted." << endl;
+            } else {
+                cout << "-- Error deleting file, try again." << endl;
+            }
+        } else {
+            cout << "-- !Failed to drop table " << tbName << " because it does not exist." << endl;
+
+        }
+    } else {
+        cout << "-- Invalid input." << endl;
+    }
 
 }
 
 bool notUsing(char* tokens) {
 
-    //tokens = strtok(NULL, " ");
     char* token1 = tokens;
     string functionName = token1;
 
@@ -205,16 +245,13 @@ bool databaseExists(const string &s) {
 }
 
 bool tableExists(string totalPath) {
-
     ifstream tbCheck;
     tbCheck.open(totalPath);
-
     if(tbCheck) {
         return true;
     } else {
         return false;
     }
-
 }
 
 void drop(char* tokens) {
