@@ -12,8 +12,8 @@ Prof. Zhao
 #include <cstring>
 #include <algorithm>
 #include <sys/types.h>
-#include <unistd.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -27,10 +27,7 @@ bool databaseExists(const string &s);
 bool tableExists(string totalPath);
 void drop(char* tokens);
 void alter(char* useLoopTokens, string dbName);
-void select(char* useLoopTokens, string useDBName);
-
-// once that is built out, when dropping databases, check if there's tables in them and empty them out in order to delete databases
-// then build out select in order to print the info in each table
+void select(char* useLoopTokens, string dbName);
 
 int main() {
 
@@ -47,6 +44,16 @@ int main() {
     return 0;
 }
 
+/**
+    Tokenize the first word in userInput.
+
+    This token decides whether to operate within a database or whether
+    to continue operating outside of a database. Depending on the 
+    token, it calls different functions nowUsing() or notUsing().
+
+    @param userInput which is the user inputted command
+    @return boolean value T/F which decides if we continue or exit
+*/
 bool tokenize(char userInput[50]) {
     
     char* tokens = strtok(userInput, " ");
@@ -71,6 +78,15 @@ bool tokenize(char userInput[50]) {
 
 }
 
+/**
+    Using a database.
+
+    User has entered USE "database name" and now operating within the use
+    database loop which allows user to create and edit tables within
+    entered database.
+
+    @param useDBName which is the name of the database currently in use
+*/
 void nowUsing(string useDBName) {
 
     bool exitUseLoop = false;
@@ -116,6 +132,15 @@ void nowUsing(string useDBName) {
 
 }
 
+/**
+    Create tables within the database in use.
+
+    Using the command tokens and the name of the database in use, creates a
+    table with inputted table name if the table name is not already in use.
+
+    @param useLoopTokens which is the user inputted command as tokens
+    @param dbName which is the database name currently in use
+*/
 void createTB(char* useLoopTokens, string dbName) {
 
     useLoopTokens = strtok(NULL, " ");
@@ -163,6 +188,15 @@ void createTB(char* useLoopTokens, string dbName) {
 
 }
 
+/**
+    Drop tables within the database in use.
+
+    Using the command tokens and the name of the database in use, drops the
+    table with inputted table name if the table exists.
+
+    @param useLoopTokens which is the user inputted command as tokens
+    @param dbName which is the database name currently in use
+*/
 void dropTB(char* useLoopTokens, string useDBName) {
 
     useLoopTokens = strtok(NULL, " ");
@@ -193,6 +227,16 @@ void dropTB(char* useLoopTokens, string useDBName) {
 
 }
 
+/**
+    Limits functions available until using a database.
+
+    This function is used before the user inputs the "USE" command and
+    is then working within a database. This limits the capabilities
+    of the user until enters the nowUsing() loop.
+
+    @param tokens which is the user inputted command as tokens
+    @return boolean value T/F which decides if we continue or exit
+*/
 bool notUsing(char* tokens) {
 
     char* token1 = tokens;
@@ -213,6 +257,15 @@ bool notUsing(char* tokens) {
 
 }
 
+/**
+    Create database.
+
+    This function creates a database with the user inputted token as
+    the name as long as the name is not already in use (the database
+    already exists).
+
+    @param tokens which is the user inputted command as tokens
+*/
 void create(char* tokens) {
 
     char* createToken = tokens;
@@ -242,12 +295,34 @@ void create(char* tokens) {
     
 }
 
+/**
+    Check if database exists already.
+
+    The inputted database name is passed into this function and it returns true
+    or false depending on if the database name correlates to a pre-existing
+    database (if the database already exists).
+
+    @param s which is the user inputted database name
+    @return boolean value T/F which correlates to if the database exists or not
+*/
 bool databaseExists(const string &s) {
     struct stat buffer;
     return(stat(s.c_str(), &buffer) == 0);
 
 }
 
+/**
+    Check if table exists already.
+
+    The inputted table path is passed into this function and it returns true
+    or false depending on if the table path correlates to a pre-existing
+    table already in the database in use (if the table already exists in
+    said database).
+
+    @param totalPath which is the user inputted table name and database in use 
+                    name formatted to a total path to the table
+    @return boolean value T/F which decides if we continue or exit
+*/
 bool tableExists(string totalPath) {
     ifstream tbCheck;
     tbCheck.open(totalPath);
@@ -258,6 +333,14 @@ bool tableExists(string totalPath) {
     }
 }
 
+/**
+    Drop database.
+
+    Using the command tokens, it finds the name of the database to be dropped
+    and drops the database with the inputted database name if it exists.
+
+    @param tokens which is the user inputted command.
+*/
 void drop(char* tokens) {
 
     char* token1 = tokens;
@@ -273,7 +356,6 @@ void drop(char* tokens) {
         
         bool exists = databaseExists(dbName);
         if (exists) {
-            // IF THERES FILE IN DATABASE, MUST DUMP THEM BEFORE DB WILL DELETE
             rmdir(charDBName);
             cout << "-- Database " << dbName << " deleted." << endl;
         } else {
@@ -284,8 +366,19 @@ void drop(char* tokens) {
 
 }
 
+/**
+    Alter tables.
+
+    This function alters tables withing the database in use if given
+    the table name, and information on how it will be altered.
+    If the table exists within the database in use, it then alters it
+    by processing the next tokens and stores the new information in the
+    table provided.
+
+    @param useLoopTokens which is the user inputted command.
+    @param dbName which is the database name in use.
+*/
 void alter(char* useLoopTokens, string dbName) {
-    cout << "alter" << endl;
 
     useLoopTokens = strtok(NULL, " ");
     char* tableToken = useLoopTokens;
@@ -339,16 +432,53 @@ void alter(char* useLoopTokens, string dbName) {
         
 }
 
-void select(char* useLoopTokens, string useDBName) {
-    cout << "select" << endl;
+/**
+    Select tables.
 
-    // read header name after select (or * which means everything)
-        // store variable name
+    This function selects tables withing the database in use if given
+    the table name, and information on how much to be selected.
+    If the table exists within the database in use, it then selects the
+    amount by processing the next tokens and displays the information to
+    the screen.
 
-    // read table name after FROM
-        // if not in database, error
-        // if table doesn't exist in database, error
-        // if header name doesn't exist, error
+    @param useLoopTokens which is the user inputted command.
+    @param dbName which is the database name in use.
+*/
+void select(char* useLoopTokens, string dbName) {
 
-    // print contents to screen seperated by |
+    useLoopTokens = strtok(NULL, " ");
+    char* selectToken = useLoopTokens;
+    string selectCheck = selectToken;
+
+    useLoopTokens = strtok(NULL, " ");
+    char* fromToken = useLoopTokens;
+    string strFromToken = fromToken;
+
+    useLoopTokens = strtok(NULL, " ");
+    char* tbNameToken = useLoopTokens;
+    string tbName = tbNameToken;
+    string totalPath = dbName + "/" + tbName + ".txt";
+
+
+    if (selectCheck == "*" && strFromToken == "FROM") {
+        bool exists;
+        exists = tableExists(totalPath);
+
+        if (exists) {
+            string tempVar;
+            ifstream printFile (totalPath.c_str());
+            if (printFile.is_open()) {
+                while (! printFile.eof()) {
+                    getline(printFile, tempVar);
+                    cout << tempVar << endl;
+                }
+            }
+            printFile.close();
+        } else {
+            cout << "-- !Failed to query table " << tbName << " because it does not exist." << endl;
+        }
+    } else {
+        cout << " -- Invalid input." << endl;
+    }
+
 }
