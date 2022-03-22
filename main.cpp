@@ -1,3 +1,10 @@
+/*
+Emily McCue
+Programming Assignment 1
+CS 457, Section 1001
+Prof. Zhao
+*/
+
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -23,7 +30,6 @@ void alter(char* useLoopTokens, string useDBName);
 void select(char* useLoopTokens, string useDBName);
 
 // once that is built out, when dropping databases, check if there's tables in them and empty them out in order to delete databases
-// be able to handle the (a1 int, a2 varchar(20)) parameters in create table
 // then build out select and alter in order to alter the info in each table
 
 int main() {
