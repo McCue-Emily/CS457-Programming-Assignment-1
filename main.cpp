@@ -368,10 +368,12 @@ bool tableExists(string totalPath) {
     ifstream tbCheck;
     tbCheck.open(totalPath);
     if(tbCheck) {
+        tbCheck.close();
         return true;
     } else {
         return false;
     }
+
 }
 
 /**
@@ -408,6 +410,8 @@ void drop(char* tokens) {
             cout << "-- !Failed to delete " << dbName << " because it does not exist." << endl;
         }
 
+    } else {
+        cout << "-- Invalid input." << endl;
     }
 
 }
