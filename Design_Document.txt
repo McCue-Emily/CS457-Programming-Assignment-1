@@ -1,0 +1,52 @@
+Title: Programming Assignment 1
+Author: Emily McCue
+Due Date: March 21, 2022
+    ---
+Class: CS 457, Section 1001
+Professor: Prof. Zhao
+
+Overview:
+    In this assignment, you will write a program that allows a database user to manage the metadata of their relational 
+    data. By metadata, we mean the database’s high-level information (e.g., database’s name, creation time, owner) as 
+    well as the properties of the tables (e.g., table’s names, attributes, constraints).
+
+System Design:
+    One directory -> database
+    One file -> table
+
+Database and Table Management:
+    The program organizes multiple databases by storing each database as a directory in the Programming Assignment 1
+    folder. In order to not create duplicate databases, each time a new database is requested to be created, the new
+    database's inputted name is stored as a string and the Programming Assignment 1 folder is combed through to see
+    if that name is already in use. If it has, it exits the request and displays to the user that it was unable to
+    complete the request because a database with that name already exists. If there is no database with the inputted
+    database name in the Programming Assignment 1 folder, then a database with that name is created and it displays
+    to the user that the database was created successfully.
+
+    The program manages multiple tables by storing each table as a file in each respective database (directory)
+    that was in use when the table was created. In order to create a table, a database must be in use as inputted by
+    the user. If there is no database in use, no table may be created. Once a database is in use, to create
+    a table, the inputted name of the table to be created is stored as a string and the database is combed through to
+    check if a file with the same name exists already. If the name is already in use, it exits the request and displays
+    to the user that it was unable to complete the request because a table with that name already exists in the
+    database that is currently in use. If the name is not in use, a file with the inputted name is created and stored
+    in the database in use. This allows the user to have tables with the same name as long as they are stored in
+    different databases, and prevents the user from creating duplicately named tables in the same database.
+
+Implementation of Functionalities:
+    Using C++ language, functionalities have been created including database creation and deletion, and table creation,
+    deletion, update and query.
+
+    Database creation consists of creating a directory with the name inputted by the user.
+
+    Database deletion cosists of deleting the directory with the name inputted by the user.
+
+    Table creation consists of creating a file with the inputted name in the database that is actively being used.
+
+    Table deletion consists of deleting the file with the inputted name in the database that is actively being used.
+
+    Table update consists of altering the table by tokenizing the user input, processing the type of update being 
+    requested, and updating the table based on the request.
+
+    Table query consists of selecting the table by tokenizing the user input, processing what is being requested to
+    select, and then displaying what has been requested.

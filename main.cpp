@@ -1,8 +1,10 @@
 /*
-Emily McCue
-Programming Assignment 1
-CS 457, Section 1001
-Prof. Zhao
+    Author: Emily McCue
+    Title: Programming Assignment 1
+    Due Date: March 21, 2022
+            ---
+    Class: CS 457, Section 1001
+    Professor: Prof. Zhao
 */
 
 #include <iostream>
@@ -80,6 +82,7 @@ bool tokenize(char userInput[50]) {
             cout << "-- !Failed to use database " << useDBName << " because it does not exist." << endl;
         }
         return false;
+
     } else {
         bool notUsingLoop = notUsing(tokens);
         return notUsingLoop;
