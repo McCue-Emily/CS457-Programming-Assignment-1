@@ -253,7 +253,7 @@ void dropTB(char* useLoopTokens, string useDBName) {
                 cout << "-- Error deleting file, try again." << endl;
             }
         } else {
-            cout << "-- !Failed to drop table " << tbName << " because it does not exist." << endl;
+            cout << "-- !Failed to delete table " << tbName << " because it does not exist." << endl;
 
         }
     } else {
@@ -276,11 +276,6 @@ bool notUsing(char* tokens) {
 
     char* token1 = tokens;
     string functionName = token1;
-
-    size_t pos;
-    while ((pos = functionName.find(";")) != string::npos) {
-        functionName.replace(pos, 1, "");
-    }
 
     if (functionName == "CREATE") {
         create(tokens);
@@ -395,13 +390,9 @@ void drop(char* tokens) {
     if (strToken2 == "DATABASE") {
         tokens = strtok(NULL, " ");
         char* charDBName = tokens;
+        charDBName[strlen(charDBName)-1] = '\0';
         string dbName = charDBName;
 
-        size_t pos;
-        while ((pos = dbName.find(";")) != string::npos) {
-            dbName.replace(pos, 1, "");
-        }
-        
         bool exists = databaseExists(dbName);
         if (exists) {
             rmdir(charDBName);
